@@ -57,7 +57,7 @@ function insertResult ($request) {
            if (empty($attach_id)) {
                $attach_id = create_attachment($item['image']);
            }
-           $post_id = createPost($item);
+           $post_id = createPost($item, in_array($lang, ['da', 'nb']));
            set_post_thumbnail( $post_id, $attach_id );
            pll_set_post_language($post_id, $lang);
            if ($lang !== 'da' || $lang !== 'nb') {

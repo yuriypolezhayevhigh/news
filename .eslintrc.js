@@ -40,6 +40,7 @@ module.exports = {
     'no-plusplus': 'off', // Disallow the unary operators ++ and --
     'arrow-body-style': ["error", "as-needed"], // Require braces in arrow function body
     'node/no-unsupported-features/node-builtins': 'off',
+    // 'node/no-unsupported-features/es-syntax': 'off',
     'semi': [2, "never"],
     "comma-dangle": ["error", {
       "arrays": "always-multiline",

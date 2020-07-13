@@ -2,7 +2,7 @@
 
 require get_theme_file_path('/inc/parse-routes.php');
 
-function createPost ($post) {
+function createPost ($post, $private = false) {
     $post_id =  wp_insert_post(array(
         'post_type' => 'post',
         'post_title' => $post['post_title'],
@@ -10,7 +10,7 @@ function createPost ($post) {
         'post_date_gmt' => $post['post_date_gmt'],
         'post_excerpt' => $post['post_excerpt'],
 //	'post_name'      => <the name>,
-        'post_status' => 'publish',
+        'post_status' => $private ? 'draft' : 'publish',
         'post_category' => $post['categories'],
         'tags_input' => $post['tags'],
     ));
@@ -50,4 +50,11 @@ function create_attachment ($attach) {
 
 
     return $attach_id;
+}
+
+add_filter( 'avatar_defaults', 'wpb_new_gravatar' );
+function wpb_new_gravatar ($avatar_defaults) {
+    $myavatar = wp_get_attachment_url(504);
+    $avatar_defaults[$myavatar] = "Infinitum Gravatar";
+    return $avatar_defaults;
 }

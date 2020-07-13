@@ -1,10 +1,11 @@
 const cheerio = require('cheerio'),
   fs = require('fs'),
-  path = require('path')
+  path = require('path'),
+  { validationService } = require('./helpers/validationSevice')
 
 const puppeteer = require('puppeteer-extra')
 // add stealth plugin and use defaults (all evasion techniques)
-const pluginStealth = require("puppeteer-extra-plugin-stealth")
+const pluginStealth = require('puppeteer-extra-plugin-stealth')
 // add recaptcha plugin and provide it your 2captcha token
 // 2captcha is the builtin solution provider but others work as well.
 const RecaptchaPlugin = require('puppeteer-extra-plugin-recaptcha') ///dist/index
@@ -15,48 +16,103 @@ const recaptchaPlugin = RecaptchaPlugin({
 puppeteer.use(pluginStealth())
 puppeteer.use(recaptchaPlugin)
 
-
 class googleTranslate {
   constructor (lang = 'ru') {
+    this.totalRequest = {
+      time: 0,
+      requestGoogle: 0,
+    }
     this.lang = lang
   }
+
   async init () {
     return new Promise(async (resolve, reject) => {
-     this.browser = await puppeteer.launch({ args: ["--no-sandbox", '--disable-setuid-sandbox'], headless: true }).then(async browser => {
-      try {
-        const page = this.page = await browser.newPage()
-        await page.setViewport({ width: 1280, height: 800 })
-        await page.goto(`https://translate.google.ru/#view=home&op=translate&sl=auto&tl=${this.lang}&`, { waitUntil: 'networkidle0' })
-        await page.solveRecaptchas()
-        resolve()
-      } catch (e) {
-        
-      }
-    })
+      this.browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: false,
+      }).then(async browser => {
+        try {
+          const page = this.page = await browser.newPage()
+          await page.setViewport({ width: 1280, height: 800 })
+          await page.goto(`https://translate.google.ru/#view=home&op=translate&sl=auto&tl=${ this.lang }&`, { waitUntil: 'networkidle0' })
+          await page.solveRecaptchas()
+          resolve()
+        } catch (e) {
+          validationService(e)
+        }
+      })
     })
   }
+
   async translate (...texts) {
     const maxLength = 4500
-
     // return text.reduce((prev, string) => prev.then(result => this.translateString(string))
     //   .then(stringTranslation => [...prev, stringTranslation]), Promise.resolve([]))
     let result = []
     for (let text of texts) {
+      text = text.replace(/<a\b[^>]*>(.*?)<\/a>/gm, '$1')
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/&nbsp;/g, '')
+        .replace(/&amp;nbsp;/g, "")
+        .replace(/<a\b[^<]*>(.*?)<\/a>/gm, '$1')
+        .replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1')
       if (text.length > maxLength) {
-        console.log(text.length, 'MAX LENGTH')
-        let ceil = Math.ceil(text.length / maxLength )
+        // console.log(text.length, 'MAX LENGTH')
+        let ceil = Math.ceil(text.length / maxLength)
         let string = ''
-        for (let index = 0; index < ceil; index++) {
-          await new Promise(  (resolve, reject) => {
-            this.translateString( text.slice(index * maxLength, index * maxLength + maxLength) ).then((data) => {
+
+
+
+
+        let step = 0
+        while(text.length > step) {
+          await this.page.waitFor(900)
+          let slice = text.slice(step, maxLength)
+          let last_index = slice.lastIndexOf('.')
+          last_index = last_index > 0 ? last_index : step + maxLength
+          await new Promise((resolve, reject) => {
+            this.translateString(text.slice(step, last_index)).then(data => {
               string += data
-              resolve(data)
+              resolve()
+            }).catch(async (err) => {
+              await this.page.waitFor(20000)
+              console.log('go to restart: BIG DATA ')
+              step = last_index
+              this.translateString(text.slice(step, last_index)).then((data) => {
+                string += data
+                resolve()
+              }).catch(() => {
+                console.log('gg bro BIG')
+              })
             })
           })
+          step = last_index
         }
         result.push(string)
+        // for (let index = 0; index < ceil; index++) {
+        //   await this.page.waitFor(500)
+        //   await new Promise((resolve, reject) => {
+        //     this.translateString(text.slice(index * maxLength, index * maxLength + maxLength)).then((data) => {
+        //       string += data
+        //
+        //     })
+        //   })
+        // }
       } else {
-        result.push(await this.translateString(text))
+        await this.page.waitFor(550)
+        await this.translateString(text).then((res) => {
+          result.push(res)
+        }).catch(async (err) => {
+          await this.page.waitFor(20000)
+          console.log('go to restart: Small DATA')
+          await this.translateString(text).then((res) => {
+            result.push(res)
+          }).catch(async () => {
+            console.log('gg bro SMALL')
+
+            await this.page.screenshot({ path: "./parser/photos/" + Date.now() + ".png", fullPage: true })
+          })
+        })
       }
     }
     if (result.length <= 1) {
@@ -65,26 +121,37 @@ class googleTranslate {
       return result
     }
   }
-  async translateString (string) {
-    return new Promise(async (resolve, reject) => {
-    try {
-      const page = this.page
-      // await page.waitForNavigation({waitUntil: 'networkidle0'});
-      let input = await page.$('#source')
-      await page.evaluate( (el) => el.value = '', input)
-      // await page.type('#source', string, { delay: 0 })
-      await page.evaluate((el, string) => el.value = string, input, string)
-      await page.waitForResponse(response => response.url().startsWith('https://translate.google.ru/translate_a/single'))
-      await page.waitForSelector('.tlid-translation.translation', { visible: true })
-      let element = await page.$(".tlid-translation.translation")
-      await page.waitFor(500)
-      let html = await page.evaluate(el => el.innerHTML, element)
-      // console.log(html)
-      resolve(html.replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
-    } catch (e) {
 
-    }
-  })
+  async translateString (string) {
+    this.totalRequest.requestGoogle += 1
+    return new Promise(async (resolve, reject) => {
+      try {
+        const page = this.page
+        // await page.waitForNavigation({waitUntil: 'networkidle0'});
+        await page.waitFor(1700)
+        let input = await page.$('#source')
+        await page.evaluate((el) => el.value = '', input)
+        // await page.type('#source', string, { delay: 0 })
+        await page.waitFor(1700)
+        await page.evaluate((el, string) => el.value = string, input, string)
+        await page.waitForResponse(response => response.url().startsWith('https://translate.google.ru/translate_a/single'))
+        await page.waitForSelector('.tlid-translation.translation', { visible: true })
+        let element = await page.$('.tlid-translation.translation')
+        await page.waitFor(2500)
+        let html = await page.evaluate(el => el.innerHTML, element)
+        // console.log(html)
+        resolve(html.replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
+      } catch (e) {
+        validationService(e)
+        console.log('try to restart')
+        reject(string)
+      }
+    })
+  }
+
+  finish () {
+    this.browser.close()
+    console.log(this.lang, ' Google Browser End ', this.totalRequest)
   }
 }
 
