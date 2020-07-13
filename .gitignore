@@ -87,13 +87,15 @@ wp-content/*
 !wp-content/mu-plugins/
 !wp-content/plugins/
 !wp-content/themes/
-
+!wp-content/themes/*
+wp-content/themes/index.php
+!.eslintrc.js
+!parser
+!parser/*
 # ignore all mu-plugins, plugins, and themes
 
 
 # track these mu-plugins, plugins, and themes
 # add your own entries here
 !wp-content/plugins/example-plugin/
-!wp-content/themes/mirawork/
-!wp-content/themes/mirawork/*
 !robots.txt

@@ -1,0 +1,35 @@
+{
+  "name": "news_infinitum",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "parse": "node ./parser/parser.js",
+    "parseGoogle": "node ./parser/googleTranslate.js",
+    "parseWP": "node ./parser/parserWP.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swaty007/news.git"
+  },
+  "author": "Alex Lialiushko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swaty007/news/issues"
+  },
+  "homepage": "https://github.com/swaty007/news#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "eslint": "^7.4.0",
+    "eslint-plugin-node": "^11.1.0",
+    "mysql": "^2.18.1",
+    "needle": "^2.5.0",
+    "puppeteer": "^5.0.0",
+    "puppeteer-extra": "^3.1.12",
+    "puppeteer-extra-plugin-recaptcha": "^3.1.13",
+    "puppeteer-extra-plugin-stealth": "^2.4.13",
+    "tress": "^1.1.4"
+  },
+  "engines": {
+    "node" : ">=9.0"
+  }
+}
