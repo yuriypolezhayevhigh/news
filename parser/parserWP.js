@@ -1,10 +1,11 @@
 const needle = require('needle'),
   { googleTranslate } = require('./googleTranslate'),
   { performance } = require('perf_hooks'),
-  { validationService } = require('./helpers/validationSevice')
+  { validationService, fixHtmlText } = require('./helpers/validationSevice')
 
 const mysql    = require('mysql'),
   connection = mysql.createConnection({
+
     host     : 'mysql191993.mysql.sysedata.no',//MIFF DK
     database : 'mysql191993',
     user     : 'mysql191993',
@@ -22,7 +23,7 @@ const mysql    = require('mysql'),
 class parserWP {
   constructor () {
     this.limit = 10
-    this.offset = 35
+    this.offset = 79
     this.total = null
     this.languages = [
       'ru',
@@ -142,20 +143,13 @@ class parserWP {
           validationService(mysql_error)
         }
         let data = {
-          post_title: item.post_title,
-          post_excerpt: item.post_excerpt,
-          post_content: item.post_content
-            .replace(/<a\b[^>]*>(.*?)<\/a>/gm, '$1')
-            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/\[caption\b[^<]*(?:(?!<\/caption])<[^<]*)*\[\/caption]/gi, '')
-            .replace(/&nbsp;/g, '')
-            .replace(/&amp;nbsp;/g, "")
-            .replace(/<a\b[^<]*>(.*?)<\/a>/gm, '$1')
-            .replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1'),
+          post_title: fixHtmlText(item.post_title),
+          post_excerpt: fixHtmlText(item.post_excerpt),
+          post_content: fixHtmlText(item.post_content),
           post_date_gmt: item.post_date_gmt,
           image: {
-            guid: results[0].guid,
-            post_title: results[0].post_title,
+            guid: results.length ? results[0].guid : '',
+            post_title: results.length ? results[0].post_title : '',
           },
         }
         resolve(data)

@@ -31,7 +31,11 @@
 					echo '</a></figure>';
 					} } ?>
 					<div class="entry-content">
-						<?php the_content( __('Read More','spicepress') ); ?>
+                        <?php if ( is_single() ) :?>
+                            <?php the_content( __('Read More','spicepress') ); ?>
+                        <?php else:;?>
+                            <?php the_excerpt( __('Read More','spicepress') ); ?>
+                        <?php endif;?>
 						<?php wp_link_pages( ); ?>
 					</div>						
 				</article>

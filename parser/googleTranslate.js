@@ -1,7 +1,7 @@
 const cheerio = require('cheerio'),
   fs = require('fs'),
   path = require('path'),
-  { validationService } = require('./helpers/validationSevice')
+  { validationService, fixHtmlText } = require('./helpers/validationSevice')
 
 const puppeteer = require('puppeteer-extra')
 // add stealth plugin and use defaults (all evasion techniques)
@@ -29,7 +29,7 @@ class googleTranslate {
     return new Promise(async (resolve, reject) => {
       this.browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: false,
+        headless: true,
       }).then(async browser => {
         try {
           const page = this.page = await browser.newPage()
@@ -50,12 +50,7 @@ class googleTranslate {
     //   .then(stringTranslation => [...prev, stringTranslation]), Promise.resolve([]))
     let result = []
     for (let text of texts) {
-      text = text.replace(/<a\b[^>]*>(.*?)<\/a>/gm, '$1')
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/&nbsp;/g, '')
-        .replace(/&amp;nbsp;/g, "")
-        .replace(/<a\b[^<]*>(.*?)<\/a>/gm, '$1')
-        .replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1')
+      text = fixHtmlText(text)
       if (text.length > maxLength) {
         // console.log(text.length, 'MAX LENGTH')
         let ceil = Math.ceil(text.length / maxLength)
@@ -71,17 +66,18 @@ class googleTranslate {
           let last_index = slice.lastIndexOf('.')
           last_index = last_index > 0 ? last_index : step + maxLength
           await new Promise((resolve, reject) => {
-            this.translateString(text.slice(step, last_index)).then(data => {
+            this.translateString(text.slice( Math.ceil(step), Math.ceil(last_index)) ).then(data => {
               string += data
               resolve()
             }).catch(async (err) => {
               await this.page.waitFor(20000)
               console.log('go to restart: BIG DATA ')
               step = last_index
-              this.translateString(text.slice(step, last_index)).then((data) => {
+              this.translateString(text.slice( Math.ceil(step), Math.ceil(last_index + maxLength)) ).then((data) => {
                 string += data
                 resolve()
-              }).catch(() => {
+              }).catch(async() => {
+                await this.page.screenshot({ path: "./parser/photos/" + Date.now() + ".png", fullPage: true })
                 console.log('gg bro BIG')
               })
             })
@@ -123,6 +119,9 @@ class googleTranslate {
   }
 
   async translateString (string) {
+    if (!string) {
+      return 'Infinitum.tech'
+    }
     this.totalRequest.requestGoogle += 1
     return new Promise(async (resolve, reject) => {
       try {
