@@ -61,7 +61,7 @@ class googleTranslate {
 
         let step = 0
         while(text.length > step) {
-          await this.page.waitFor(900)
+          await this.page.waitFor(600)
           let slice = text.slice(step, maxLength)
           let last_index = slice.lastIndexOf('.')
           last_index = last_index > 0 ? last_index : step + maxLength
@@ -104,8 +104,7 @@ class googleTranslate {
           await this.translateString(text).then((res) => {
             result.push(res)
           }).catch(async () => {
-            console.log('gg bro SMALL')
-
+            console.log('gg bro SMALL go restart')
             await this.page.screenshot({ path: "./parser/photos/" + Date.now() + ".png", fullPage: true })
           })
         })

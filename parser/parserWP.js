@@ -68,6 +68,9 @@ class parserWP {
         for (let item of results) {
           console.log('go parse ID: ', item.ID)
           await this.setPostLanguage(item)
+            .catch(e => {
+              console.log('go fail ID: ', item.ID, '  ERROR GO NEXT')
+            })
           this.totalRequest.posts += 1
         }
 
@@ -121,7 +124,7 @@ class parserWP {
             }).catch(err => {
               validationService(err)
               console.log('error post pars ID:', item.ID)
-              resolve()
+              reject('setPostLanguage')
             })
         }
       })
