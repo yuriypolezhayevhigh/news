@@ -23,7 +23,7 @@ const mysql    = require('mysql'),
 class parserWP {
   constructor () {
     this.limit = 10
-    this.offset = 79
+    this.offset = 349
     this.total = null
     this.languages = [
       'ru',

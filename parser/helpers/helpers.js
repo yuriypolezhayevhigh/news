@@ -12,6 +12,8 @@ function fixHtmlText (text) {
     .replace(/&amp;nbsp;/g, "")
     .replace(/<a\b[^<]*>(.*?)<\/a>/gm, '$1')
     .replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1')
+    .replace(/MIFF Denmark/ig, 'Infinitum News')
+    .replace(/miff/ig, 'Infinitum News')
 }
 
 module.exports = {
