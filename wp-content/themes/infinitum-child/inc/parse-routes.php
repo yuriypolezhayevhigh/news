@@ -72,10 +72,10 @@ function insertResult($request)
                 $arrSave['uk'] = $catUk;
                 $arrSave['en'] = $catEn;
                 $arrSave['ru'] = $catRu;
-                if(!empty($catDa)) {
+                if($catDa) {
                     $arrSave['da'] = $catDa;
                 }
-                if(!empty($catNb)) {
+                if($catNb) {
                     $arrSave['nb'] = $catNb;
                 }
                 pll_save_term_translations($arrSave);
@@ -85,7 +85,7 @@ function insertResult($request)
             if (empty($attach_id)) {
                 $attach_id = !empty($item['image']) ? create_attachment($item['image']) : 315; //default
             }
-            $post_id = createPost($item, $category[$lang], in_array($lang, ['da', 'nb']));
+            $post_id = createPost($item, in_array($lang, ['da', 'nb']), $category[$lang]);
             set_post_thumbnail($post_id, $attach_id);
             pll_set_post_language($post_id, $lang);
 //            if ($lang !== 'da' || $lang !== 'nb') {

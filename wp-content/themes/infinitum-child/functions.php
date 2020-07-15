@@ -2,7 +2,7 @@
 
 require get_theme_file_path('/inc/parse-routes.php');
 
-function createPost ($post, $category, $private = false) {
+function createPost ($post, $private = false, $category = []) {
     $post_id =  wp_insert_post(array(
         'post_type' => 'post',
         'post_title' => $post['post_title'],
