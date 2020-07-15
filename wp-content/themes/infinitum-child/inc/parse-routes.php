@@ -24,27 +24,50 @@ function insertResult ($request) {
        $attach_id = null;
        $main_post_id = null;
        $posts = [];
-
+       $category = [
+           'uk' => [],
+           'en' => [],
+           'ru' => [],
+           'da' => [],
+           'nb' => [],
+       ];
        if (!empty($json_parsed['uk']['categories'])) {
            require_once( ABSPATH . '/wp-admin/includes/taxonomy.php');
            for ($i = 0; $i < count($json_parsed['uk']['categories']); $i++ ) {
+               $catUk = wp_insert_category([
+                   'cat_name' => $json_parsed['uk']['categories'][$i],
+                   'category_parent' => pll_get_term(46, 'uk'), //Denmark
+               ]);
+               $category['uk'][] = $catUk;
+
+               $catEn = wp_insert_category([
+                   'cat_name' => $json_parsed['en']['categories'][$i],
+                   'category_parent' => pll_get_term(46, 'en'), //Denmark
+               ]);
+               $category['en'][] = $catEn;
+
+               $catRu = wp_insert_category([
+                   'cat_name' => $json_parsed['ru']['categories'][$i],
+                   'category_parent' => pll_get_term(46, 'ru'), //Denmark
+               ]);
+               $category['ru'][] = $catRu;
+
+               $catDa = wp_insert_category([
+                   'cat_name' => $json_parsed['da']['categories'][$i],
+                   'category_parent' => pll_get_term(46, 'da'), //Denmark
+               ]);
+               $category['da'][] = $catDa;
+
+//               $catNb = wp_insert_category([
+////                   'cat_name' => $json_parsed['nb']['categories'][$i],
+////                   'category_parent' => pll_get_term(46, 'nb'), //Denmark
+////               ]);
+/// $category['nb'][] = $catNb;
                pll_save_term_translations([
-                   'uk' => wp_insert_category([
-                       'cat_name' => $json_parsed['uk']['categories'][$i],
-                       'category_parent' => pll_get_term(46, 'uk'), //Denmark
-                   ]),
-                   'en' => wp_insert_category([
-                       'cat_name' => $json_parsed['en']['categories'][$i],
-                       'category_parent' => pll_get_term(46, 'en'), //Denmark
-                   ]),
-                   'ru' => wp_insert_category([
-                       'cat_name' => $json_parsed['ru']['categories'][$i],
-                       'category_parent' => pll_get_term(46, 'ru'), //Denmark
-                   ]),
-                   'da' => wp_insert_category([
-                       'cat_name' => $json_parsed['da']['categories'][$i],
-                       'category_parent' => pll_get_term(46, 'da'), //Denmark
-                   ]),
+                   'uk' => $catUk,
+                   'en' => $catEn,
+                   'ru' => $catRu,
+                   'da' => $catDa,
 //                   'nb' => wp_insert_category([
 //                       'cat_name' => $json_parsed['nb']['categories'][$i],
 //                       'category_parent' => pll_get_term_language(46, 'nb'), //Denmark
@@ -57,7 +80,7 @@ function insertResult ($request) {
            if (empty($attach_id)) {
                $attach_id = !empty($item['image']) ? create_attachment($item['image']) : 315; //default
            }
-           $post_id = createPost($item, in_array($lang, ['da', 'nb']));
+           $post_id = createPost($item, $category[$lang], in_array($lang, ['da', 'nb']));
            set_post_thumbnail( $post_id, $attach_id );
            pll_set_post_language($post_id, $lang);
            if ($lang !== 'da' || $lang !== 'nb') {
