@@ -23,7 +23,7 @@ const mysql    = require('mysql'),
 class parserWP {
   constructor () {
     this.limit = 10
-    this.offset = 391
+    this.offset = 447
     this.total = null
     this.languages = [
       'ru',
@@ -115,9 +115,9 @@ class parserWP {
                     validationService(err)
                     return
                   }
+                  console.log(res.body)
                   if (res.body) {
                     resolve()
-                    console.log(res.body)
                   }
                 })
               }

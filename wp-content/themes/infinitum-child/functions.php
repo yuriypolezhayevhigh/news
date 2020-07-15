@@ -25,16 +25,20 @@ function createPost ($post, $private = false, $category = []) {
     return $post_id;
 }
 function create_attachment ($attach) {
+//    $file_name = basename( $file_path );
+//    $file_type = wp_check_filetype( $file_name, null );
+//    $attachment_title = sanitize_file_name( pathinfo( $file_name, PATHINFO_FILENAME ) );
     include_once( ABSPATH . 'wp-admin/includes/image.php' );
     $imageurl = $attach['guid'];
+    $attachTitle = !empty($attach['post_title']) ? sanitize_file_name($attach['post_title']) : sanitize_file_name(pathinfo(basename($imageurl), PATHINFO_FILENAME));
     $imagetype = end(explode('/', getimagesize($imageurl)['mime']));
 //        $uniq_name = date('dmY').''.(int) microtime(true);
-    $filename = $attach['post_title'].'.'.$imagetype;
     $uploaddir = wp_upload_dir();
+    $filename = wp_unique_filename($uploaddir['path'],$attachTitle.'.'.$imagetype);
     $uploadfile = $uploaddir['path'] . '/' . $filename;
     $contents = file_get_contents($imageurl);
     if (file_exists($uploadfile)) {
-        $filename = $attach['post_title'] . date('dmY').'.'.$imagetype;
+        $filename = $attachTitle . date('dmY').'.'.$imagetype;
         $uploadfile = $uploaddir['path'] . '/' . $filename;
     }
     $savefile = fopen($uploadfile, 'w');
@@ -44,7 +48,7 @@ function create_attachment ($attach) {
     $attachment = array(
 //            'guid' => $uploaddir . '/' . basename( $filename ),
         'post_mime_type' => $wp_filetype['type'],
-        'post_title' => $filename,
+        'post_title' => $attachTitle,
         'post_content' => '',
         'post_status' => 'inherit'
     );
@@ -52,11 +56,39 @@ function create_attachment ($attach) {
     $imagenew = get_post( $attach_id );
     $fullsizepath = get_attached_file( $imagenew->ID );
     $attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
+//    unset($attach_data['sizes']);
     wp_update_attachment_metadata( $attach_id, $attach_data );
-
 
     return $attach_id;
 }
+
+
+// thumbnail disable start
+function shapeSpace_customize_image_sizes($sizes) {
+    unset($sizes['thumbnail']);    // disable thumbnail size
+    unset($sizes['medium']);       // disable medium size
+    unset($sizes['large']);        // disable large size
+    unset($sizes['medium_large']); // disable medium-large size
+    unset($sizes['1536x1536']);    // disable 2x medium-large size
+    unset($sizes['2048x2048']);    // disable 2x large size
+    return $sizes;
+}
+add_filter('intermediate_image_sizes_advanced', 'shapeSpace_customize_image_sizes');
+// disable scaled image size
+add_filter('big_image_size_threshold', '__return_false');
+
+// disable other image sizes
+function shapeSpace_disable_other_image_sizes() {
+    remove_image_size('post-thumbnail'); // disable images added via set_post_thumbnail_size()
+//    remove_image_size('another-size');   // disable any other added image sizes
+}
+add_action('init', 'shapeSpace_disable_other_image_sizes');
+// disable srcset on frontend
+function disable_wp_responsive_images() {
+    return 1;
+}
+add_filter('max_srcset_image_width', 'disable_wp_responsive_images');
+// thumbnail disable end
 
 add_filter( 'avatar_defaults', 'wpb_new_gravatar' );
 function wpb_new_gravatar ($avatar_defaults) {

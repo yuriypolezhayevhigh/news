@@ -83,7 +83,7 @@ function insertResult($request)
         };
         foreach ($json_parsed as $lang => $item) {
             if (empty($attach_id)) {
-                $attach_id = !empty($item['image']) ? create_attachment($item['image']) : 315; //default
+                $attach_id = !empty($item['image']['guid']) ? create_attachment($item['image']) : 315; //default
             }
             $post_id = createPost($item, in_array($lang, ['da', 'nb']), $category[$lang]);
             set_post_thumbnail($post_id, $attach_id);
