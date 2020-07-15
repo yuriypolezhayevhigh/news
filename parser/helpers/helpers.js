@@ -13,7 +13,7 @@ function fixHtmlText (text) {
     .replace(/<a\b[^<]*>(.*?)<\/a>/gm, '$1')
     .replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1')
     .replace(/MIFF Denmark/ig, 'Infinitum News')
-    .replace(/\smiff\s/ig, ' Infinitum News ')
+    .replace(/(\s|^)miff(\s|$)/ig, ' Infinitum News ')
 }
 
 module.exports = {
