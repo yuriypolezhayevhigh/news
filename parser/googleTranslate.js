@@ -1,7 +1,7 @@
 const cheerio = require('cheerio'),
   fs = require('fs'),
   path = require('path'),
-  { validationService, fixHtmlText } = require('./helpers/validationSevice')
+  { validationService, fixHtmlText } = require('./helpers/helpers')
 
 const puppeteer = require('puppeteer-extra')
 // add stealth plugin and use defaults (all evasion techniques)

@@ -1,7 +1,7 @@
 const needle = require('needle'),
   { googleTranslate } = require('./googleTranslate'),
   { performance } = require('perf_hooks'),
-  { validationService, fixHtmlText } = require('./helpers/validationSevice')
+  { validationService, fixHtmlText } = require('./helpers/helpers')
 
 const mysql    = require('mysql'),
   connection = mysql.createConnection({
@@ -74,11 +74,13 @@ class parserWP {
         if (this.total <= this.offset + this.limit) {
           this.offset += this.limit
           console.log('Loop Done', this.totalRequest)
+          console.log(this.offset, ' offset')
           this.loop()
         } else {
           this.totalRequest.time = performance.now() - this.totalRequest.time
           console.timeEnd("Posts Parser")
           console.log(this.totalRequest)
+          console.log(this.offset, ' offset')
          console.log(this.googleru.finish())
          console.log(this.googleuk.finish())
          console.log(this.googleen.finish())
@@ -106,7 +108,7 @@ class parserWP {
 
                 needle.post(this.insertUrl, translates, { json:true }, (err, res) => {
                   if (err) {
-                    console.log(err, 'error Request', this.insertUrl)
+                    console.log(err, 'error Request Save', this.insertUrl)
                     validationService(err)
                     return
                   }
@@ -116,6 +118,10 @@ class parserWP {
                   }
                 })
               }
+            }).catch(err => {
+              validationService(err)
+              console.log('error post pars ID:', item.ID)
+              resolve()
             })
         }
       })
@@ -123,16 +129,21 @@ class parserWP {
   }
   async translatePost (originalPost, lang) {
     return await new Promise(  async (resolve, reject) => {
-      let data = {
-        post_title: await this['google' + lang].translate(originalPost.post_title),
-        post_excerpt: await this['google' + lang].translate(originalPost.post_excerpt),
-        post_content: await this['google' + lang].translate(originalPost.post_content),
-        post_date_gmt: originalPost.post_date_gmt,
-        image: originalPost.image,
-        tags: await this['google' + lang].translate(...originalPost.tags),
-        categories: await this['google' + lang].translate(...originalPost.categories),
+      try {
+        let data = {
+          post_title: await this['google' + lang].translate(originalPost.post_title),
+          post_excerpt: await this['google' + lang].translate(originalPost.post_excerpt),
+          post_content: await this['google' + lang].translate(originalPost.post_content),
+          post_date_gmt: originalPost.post_date_gmt,
+          image: originalPost.image,
+          tags: await this['google' + lang].translate(...originalPost.tags),
+          categories: await this['google' + lang].translate(...originalPost.categories),
+        }
+        resolve(data)
+      } catch (e) {
+        console.log('go miss post and try next, on translatePost')
+        reject()
       }
-      resolve(data)
     })
   }
   async getPostMeta (item) {

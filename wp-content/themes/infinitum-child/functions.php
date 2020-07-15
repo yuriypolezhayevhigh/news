@@ -10,6 +10,7 @@ function createPost ($post, $private = false) {
         'post_date_gmt' => $post['post_date_gmt'],
         'post_excerpt' => $post['post_excerpt'],
 //	'post_name'      => <the name>,
+        'post_author'   => 2,
         'post_status' => $private ? 'draft' : 'publish',
         'post_category' => $post['categories'],
         'tags_input' => $post['tags'],
