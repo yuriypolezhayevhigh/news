@@ -75,6 +75,7 @@ class parserWP {
         }
 
         if (this.total <= this.offset + this.limit) {
+          this.totalRequest.time = performance.now() - this.totalRequest.time
           this.offset += this.limit
           console.log('Loop Done', this.totalRequest)
           console.log(this.offset, ' offset')

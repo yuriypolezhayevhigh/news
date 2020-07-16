@@ -142,17 +142,12 @@ $you_missed_enable = esc_attr(get_theme_mod('you_missed_enable','true'));
                         <div class="row">
                             <div class="col-md-6 text-xs">
                                 <p>
-                                <a href="<?php echo esc_url( __( 'https://wordpress.org/', 'newses' ) ); ?>">
+                                <a href="<?php echo esc_url( __( 'https://infinitum.tech/', 'Infinitum' ) ); ?>">
 								<?php
 								/* translators: placeholder replaced with string */
-								printf( esc_html__( 'Proudly powered by %s', 'newses' ), 'WordPress' );
+								printf( esc_html__( 'Proudly powered by Infinitum', 'newses' ), 'WordPress' );
 								?>
 								</a>
-								<span class="sep"> | </span>
-								<?php
-								/* translators: placeholder replaced with string */
-								printf( esc_html__( 'Theme: %1$s by %2$s.', 'newses' ), 'Newses', '<a href="' . esc_url( __( 'https://themeansar.com/', 'newses' ) ) . '" rel="designer">Themeansar</a>' );
-								?>
 								</p>
                             </div>
 
