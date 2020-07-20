@@ -9,6 +9,7 @@ function fixHtmlText (text) {
     .replace(/&amp;/g, '')
     .replace(/&lt;/g, '')
     .replace(/&gt;/g, '')
+    .replace(/&#039;/g, '')
     .replace(/&amp;nbsp;/g, "")
     .replace(/<a\b[^<]*>(.*?)<\/a>/gm, '$1')
     .replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1')

@@ -27,10 +27,11 @@ class googleTranslate {
 
   async init () {
     return new Promise(async (resolve, reject) => {
-      this.browser = await puppeteer.launch({
+      await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         headless: true,
       }).then(async browser => {
+        this.browser = browser
         try {
           const page = this.page = await browser.newPage()
           await page.setViewport({ width: 1280, height: 800 })
@@ -61,7 +62,7 @@ class googleTranslate {
 
         let step = 0
         while(text.length > step) {
-          await this.page.waitFor(600)
+          await this.page.waitFor(500)
           let slice = text.slice(step, maxLength)
           let last_index = slice.lastIndexOf('.')
           last_index = last_index > 0 ? last_index : step + maxLength
@@ -76,7 +77,7 @@ class googleTranslate {
               this.translateString(text.slice( Math.ceil(step), Math.ceil(last_index + maxLength)) ).then((data) => {
                 string += data
                 resolve()
-              }).catch(async() => {
+              }).catch(async () => {
                 await this.page.screenshot({ path: "./parser/photos/" + Date.now() + ".png", fullPage: true })
                 console.log('gg bro BIG')
               })
@@ -95,7 +96,7 @@ class googleTranslate {
         //   })
         // }
       } else {
-        await this.page.waitFor(550)
+        await this.page.waitFor(300)
         await this.translateString(text).then((res) => {
           result.push(res)
         }).catch(async (err) => {
@@ -126,16 +127,16 @@ class googleTranslate {
       try {
         const page = this.page
         // await page.waitForNavigation({waitUntil: 'networkidle0'});
-        await page.waitFor(1700)
+        await page.waitFor(1300)
         let input = await page.$('#source')
         await page.evaluate((el) => el.value = '', input)
         // await page.type('#source', string, { delay: 0 })
-        await page.waitFor(1700)
+        await page.waitFor(1500)
         await page.evaluate((el, string) => el.value = string, input, string)
         await page.waitForResponse(response => response.url().startsWith('https://translate.google.ru/translate_a/single'))
         await page.waitForSelector('.tlid-translation.translation', { visible: true })
         let element = await page.$('.tlid-translation.translation')
-        await page.waitFor(2500)
+        await page.waitFor(2200)
         let html = await page.evaluate(el => el.innerHTML, element)
         // console.log(html)
         resolve(html.replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
@@ -148,8 +149,8 @@ class googleTranslate {
   }
 
   finish () {
-    this.browser.close()
     console.log(this.lang, ' Google Browser End ', this.totalRequest)
+    this.browser.close()
   }
 }
 

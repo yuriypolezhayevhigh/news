@@ -22,8 +22,12 @@ const mysql    = require('mysql'),
 
 class parserWP {
   constructor () {
-    this.limit = 10
-    this.offset = 447
+
+    this.limit = 30
+    this.offset = 0
+    this.lastDate = new Date('2020-07-17 14:47:19.000Z')
+    this.firstDate = new Date('2008-09-15 12:11:07.000Z')
+    this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
     this.total = null
     this.languages = [
       'ru',
@@ -31,13 +35,16 @@ class parserWP {
       'uk',
     ]
     this.totalRequest = {
-      time: 0,
+      time: performance.now(), //1000
       posts: 0,
     }
-    this.totalRequest.time = performance.now()
     console.time("Posts Parser")
+    // setTimeout(() => {
+    //   this.totalRequest.time = performance.now() - this.totalRequest.time
+    //   console.timeEnd("Posts Parser")
+    //   console.log(this.totalRequest)
+    // }, 5000)
     this.init()
-    this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
   }
   async init () {
     this.googleru = new googleTranslate()
@@ -50,7 +57,7 @@ class parserWP {
     ])
     console.log('init google')
 
-    connection.query(`SELECT count(*) as total FROM wp_posts WHERE post_type='post' AND post_status='publish'`, function (err, result) {
+    connection.query(`SELECT count(*) as total FROM wp_posts WHERE post_type='post' AND post_status='publish'`,  (err, result) => {
       console.log(result[0].total)
       this.total = result[0].total
     })
@@ -58,7 +65,7 @@ class parserWP {
   }
   async loop () {
     connection.query(`SELECT * FROM wp_posts LEFT JOIN wp_postmeta ON wp_postmeta.post_id = wp_posts.ID AND wp_postmeta.meta_key = '_thumbnail_id'
- WHERE wp_posts.post_type='post' AND wp_posts.post_status='publish' LIMIT ? OFFSET ?`,
+ WHERE wp_posts.post_type='post' AND wp_posts.post_status='publish' ORDER BY wp_posts.post_date_gmt DESC LIMIT ? OFFSET ?`,
       [this.limit, this.offset],
       async (error, results, fields) => {
         if (error) {
@@ -66,25 +73,30 @@ class parserWP {
           validationService(error)
         }
         for (let item of results) {
-          console.log('go parse ID: ', item.ID)
-          await this.setPostLanguage(item)
-            .catch(e => {
-              console.log('go fail ID: ', item.ID, '  ERROR GO NEXT')
-            })
-          this.totalRequest.posts += 1
+          console.log('go parse ID: ', item.ID, ' date dmt = ', item.post_date_gmt, String(item.post_date_gmt))
+          // console.log(item.post_date_gmt, this.lastDate)
+          if (item.post_date_gmt > this.lastDate || item.post_date_gmt < this.firstDate) {
+            await this.setPostLanguage(item)
+              .catch(e => {
+                console.log('go fail ID: ', item.ID, '  ERROR GO NEXT')
+              })
+            this.totalRequest.posts += 1
+          } else {
+            console.log('skip ID: ', item.ID, ' date dmt = ', item.post_date_gmt, String(item.post_date_gmt))
+          }
         }
 
-        if (this.total <= this.offset + this.limit) {
+        if (this.total >= this.offset) {
           this.totalRequest.time = performance.now() - this.totalRequest.time
           this.offset += this.limit
           console.log('Loop Done', this.totalRequest)
-          console.log(this.offset, ' offset')
+          console.log(this.offset, ' offset, ', this.total, ' total')
           this.loop()
         } else {
           this.totalRequest.time = performance.now() - this.totalRequest.time
           console.timeEnd("Posts Parser")
           console.log(this.totalRequest)
-          console.log(this.offset, ' offset')
+          console.log(this.offset, ' offset, ', this.total, ' total')
          console.log(this.googleru.finish())
          console.log(this.googleuk.finish())
          console.log(this.googleen.finish())
