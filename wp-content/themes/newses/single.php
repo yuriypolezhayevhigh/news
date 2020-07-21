@@ -26,21 +26,25 @@
               <div class="media mg-info-author-block"> 
                   <?php $newses_single_post_admin_details = esc_attr(get_theme_mod('newses_single_post_admin_details','true'));
                   if($newses_single_post_admin_details == true){ ?>
-                  <a class="mg-author-pic" href="#"> <?php echo get_avatar( get_the_author_meta( 'ID') , 150); ?> </a>
+                   <a class="mg-author-pic" href="<?php echo esc_url(get_author_posts_url( get_the_author_meta( 'ID' ) ));?>"> <?php echo get_avatar( get_the_author_meta( 'ID') , 150); ?> </a>
                 <?php } ?>
                   <div class="media-body">
                     <?php $newses_single_post_admin_details = esc_attr(get_theme_mod('newses_single_post_admin_details','true'));
                   if($newses_single_post_admin_details == true){ ?>
-                    <h4 class="media-heading"><span><?php esc_html_e('By','newses'); ?></span><a href="<?php echo esc_url(get_author_posts_url( get_the_author_meta( 'ID' ) ));?>"><?php the_author(); ?></a></h4>
+                    <h4 class="media-heading"><span><?php esc_html_e('By','newsup'); ?></span><a href="<?php echo esc_url(get_author_posts_url( get_the_author_meta( 'ID' ) ));?>"><?php the_author(); ?></a></h4>
                     <?php } ?>
                     <?php $newses_single_post_date = esc_attr(get_theme_mod('newses_single_post_date','true'));
                     if($newses_single_post_date == true){ ?>
                     <span class="mg-blog-date"><i class="fa fa-clock-o"></i> 
                       <?php echo get_the_date('M'); ?> <?php echo get_the_date('j,'); ?> <?php echo get_the_date('Y'); ?></span>
-                    <?php $tag_list = get_the_tag_list();
+                    <?php }
+                    $newsup_single_post_tag = esc_attr(get_theme_mod('newses_single_post_tag','true'));
+                    if($newsup_single_post_tag == true){
+                    $tag_list = get_the_tag_list();
                     if($tag_list){ ?>
                     <span class="newses-tags"><i class="fa fa-tag"></i>
-                      <a href="<?php the_permalink(); ?>"><?php the_tags('', ', ', ''); ?></a></span>
+                      <a href="<?php the_permalink(); ?>"><?php the_tags('', ', ', ''); ?></a>
+                    </span>
                   <?php } } ?>
                   </div>
                 </div>
@@ -64,9 +68,7 @@
                     <?php } elseif($newses_single_page_layout == "single-full-width-content") { ?>
                      <div class="col-md-12">
                      <?php } ?>
-		      <?php if(have_posts())
-		        {
-		      while(have_posts()) { the_post(); ?>
+		      <?php while (have_posts()) : the_post(); ?>
             <div class="mg-blog-post-box"> 
               <?php
               $single_show_featured_image = esc_attr(get_theme_mod('single_show_featured_image','true'));
@@ -78,20 +80,20 @@
                 <?php the_content(); ?>
                 <?php newses_edit_link(); ?>
               </article>
-
             </div>
-		      <?php } ?>
-<div class="clearfix mb-4"></div>
-           <div class="media mg-info-author-block">
-            <?php $newses_enable_single_post_admin_details = esc_attr(get_theme_mod('newses_enable_single_post_admin_details','true'));
+            <div class="clearfix mb-4"></div>
+            <?php $newses_enable_single_post_admin_details = esc_attr(get_theme_mod('newses_enable_single_post_admin_details',true));
             if($newses_enable_single_post_admin_details == true) { ?>
+           <div class="media mg-info-author-block">
+            <?php  ?>
             <a class="mg-author-pic" href="<?php echo esc_url(get_author_posts_url( get_the_author_meta( 'ID' ) ));?>"><?php echo get_avatar( get_the_author_meta( 'ID') , 150); ?></a>
                 <div class="media-body">
                   <h4 class="media-heading"><a href ="<?php echo esc_url(get_author_posts_url( get_the_author_meta( 'ID' ) ));?>"><?php the_author(); ?></a></h4>
                   <p><?php the_author_meta( 'description' ); ?></p>
                 </div>
-              <?php } ?>
-            </div><?php $newses_enable_related_post = esc_attr(get_theme_mod('newses_enable_related_post','true'));
+            </div>
+            <?php } ?>
+            <?php $newses_enable_related_post = esc_attr(get_theme_mod('newses_enable_related_post','true'));
                                 if($newses_enable_related_post == true){
                             ?>
               <div class="wd-back">
@@ -161,10 +163,13 @@
                             
                     </div>
                     <!--End mg-realated-slider -->
-                  <?php } }
-         $newses_enable_single_post_admin_details = esc_attr(get_theme_mod('newses_enable_single_post_admin_details','true'));
-         if($newses_enable_single_post_admin_details == true) {
-         comments_template('',true); } ?>
+          <?php } $newses_enable_single_post_comments = esc_attr(get_theme_mod('newses_enable_single_post_comments',true));
+         if($newses_enable_single_post_comments == true) {
+                  if (comments_open() || get_comments_number()) :
+                                comments_template();
+                            endif; } endwhile; // End of the loop.
+          ?>
+
       </div>
        <?php if($newses_single_page_layout == "single-align-content-right") { ?>
       <!--sidebar-->

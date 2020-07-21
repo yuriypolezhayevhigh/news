@@ -655,6 +655,20 @@ $wp_customize->add_control(new Newses_Toggle_Control( $wp_customize, 'newses_sin
         )
     ));
 
+    $wp_customize->add_setting('newses_enable_single_post_admin_details',
+    array(
+        'default' => true,
+        'sanitize_callback' => 'newses_sanitize_checkbox',
+    )
+);
+$wp_customize->add_control(new Newses_Toggle_Control( $wp_customize, 'newses_enable_single_post_admin_details', 
+    array(
+        'label' => esc_html__('Hide/Show Author Details', 'newses'),
+        'type' => 'toggle',
+        'section' => 'site_single_posts_settings',
+    )
+));
+
 
     
 
@@ -751,51 +765,8 @@ $wp_customize->add_control(new Newses_Toggle_Control( $wp_customize, 'newses_ena
     )
 ));
 
-$wp_customize->add_setting('newses_enable_single_post_comments',
-    array(
-        'default' => true,
-        'sanitize_callback' => 'newses_sanitize_checkbox',
-    )
-);
-$wp_customize->add_control(new Newses_Toggle_Control( $wp_customize, 'newses_enable_single_post_comments', 
-    array(
-        'label' => esc_html__('Hide/Show Comments', 'newses'),
-        'type' => 'toggle',
-        'section' => 'site_single_posts_settings',
-    )
-));
 
-$wp_customize->add_setting('newses_enable_single_post_admin',
-    array(
-        'default' => true,
-        'sanitize_callback' => 'newses_sanitize_checkbox',
-    )
-);
-$wp_customize->add_control(new Newses_Toggle_Control( $wp_customize, 'newses_enable_single_post_admin', 
-    array(
-        'label' => esc_html__('Hide/Show Author Name', 'newses'),
-        'type' => 'toggle',
-        'section' => 'site_single_posts_settings',
-    )
-));
-
-
-$wp_customize->add_setting('newses_enable_single_post_admin_details',
-    array(
-        'default' => true,
-        'sanitize_callback' => 'newses_sanitize_checkbox',
-    )
-);
-$wp_customize->add_control(new Newses_Toggle_Control( $wp_customize, 'newses_enable_single_post_admin_details', 
-    array(
-        'label' => esc_html__('Hide/Show Author Details', 'newses'),
-        'type' => 'toggle',
-        'section' => 'site_single_posts_settings',
-    )
-));
-
-
- $wp_customize->add_section('you_missed_section',
+    $wp_customize->add_section('you_missed_section',
     array(
         'title' => esc_html__('You Missed Section', 'newses'),
         'priority' => 100,

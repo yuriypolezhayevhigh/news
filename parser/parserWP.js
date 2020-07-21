@@ -3,9 +3,8 @@ const needle = require('needle'),
   { performance } = require('perf_hooks'),
   { validationService, fixHtmlText } = require('./helpers/helpers')
 
-const mysql    = require('mysql'),
-  connection = mysql.createConnection({
-
+const mysql    = require('mysql')
+  let connection = mysql.createConnection({
     host     : 'mysql191993.mysql.sysedata.no',//MIFF DK
     database : 'mysql191993',
     user     : 'mysql191993',
@@ -24,8 +23,8 @@ class parserWP {
   constructor () {
     this.limit = 30
     this.offset = 0
-    this.lastDate = new Date('2020-07-20 07:52:46.000Z')
-    this.firstDate = new Date('2008-09-15 12:11:07.000Z')
+    this.lastDate = new Date('2020-07-21T10:40:33.000Z') //DK
+    this.firstDate = new Date('2007-09-15 12:11:07.000Z') //DK
     this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
     this.total = null
     this.languages = [
@@ -33,6 +32,7 @@ class parserWP {
       'en',
       'uk',
     ]
+    this.domainsParsed = 0
     this.totalRequest = {
       time: performance.now(), //1000
       posts: 0,
@@ -45,6 +45,37 @@ class parserWP {
     // }, 5000)
 
     this.init()
+  }
+  parseNewDomain () {
+    if (this.domainsParsed === 1) {
+      this.totalRequest.time = performance.now() - this.totalRequest.time
+      console.timeEnd("Posts Parser")
+      console.log(this.totalRequest)
+      console.log(this.offset, ' offset, ', this.total, ' total')
+      this.googleru.finish()
+      this.googleuk.finish()
+      this.googleen.finish()
+      return
+    }
+    this.domainsParsed++
+
+    this.offset = 0
+    this.total = null
+    connection = mysql.createConnection({
+        host     : 'mysql191993.mysql.sysedata.no',//MIFF NO
+        database : 'mysql191993',
+        user     : 'mysql191993',
+        password : '&Jwh3;~rB6ZR',
+      }),
+      mainLang = 'nb'
+    this.lastDate = new Date('2020-07-21T10:40:33.000Z') //NO
+    this.firstDate = new Date('2021-07-21 12:11:07.000Z') //NO
+
+    connection.query(`SELECT count(*) as total FROM wp_posts WHERE post_type='post' AND post_status='publish'`,  (err, result) => {
+      console.log(result[0].total)
+      this.total = result[0].total
+    })
+    this.loop()
   }
   async init () {
     this.googleru = new googleTranslate()
@@ -73,9 +104,8 @@ class parserWP {
           validationService(error)
         }
         for (let item of results) {
-          console.log('go parse ID: ', item.ID, ' date dmt = ', item.post_date_gmt, String(item.post_date_gmt))
-          // console.log(item.post_date_gmt, this.lastDate)
           if (item.post_date_gmt > this.lastDate || item.post_date_gmt < this.firstDate) {
+            console.log('go parse ID: ', item.ID, ' date dmt = ', item.post_date_gmt, String(item.post_date_gmt))
             await this.setPostLanguage(item)
               .catch(e => {
                 console.log('go fail ID: ', item.ID, '  ERROR GO NEXT')
@@ -94,12 +124,13 @@ class parserWP {
           this.loop()
         } else {
           this.totalRequest.time = performance.now() - this.totalRequest.time
-          console.timeEnd("Posts Parser")
+          // console.timeEnd("Posts Parser")
           console.log(this.totalRequest)
           console.log(this.offset, ' offset, ', this.total, ' total')
-         this.googleru.finish()
-         this.googleuk.finish()
-         this.googleen.finish()
+          this.parseNewDomain()
+         // this.googleru.finish()
+         // this.googleuk.finish()
+         // this.googleen.finish()
         }
       })
   }
