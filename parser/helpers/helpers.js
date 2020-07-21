@@ -16,6 +16,10 @@ function fixHtmlText (text) {
     .replace(/MIFF Denmark/ig, 'Infinitum News')
     .replace(/(\s|^)miff(\s|$)/ig, ' Infinitum News ')
 }
+function filterFileNameText (text) {
+  // /[^0-9a-z-]/g
+  return text.replace(/[^_\-@.()+*/'a-zA-Z0-9]/g, '')
+}
 
 module.exports = {
   validationService,

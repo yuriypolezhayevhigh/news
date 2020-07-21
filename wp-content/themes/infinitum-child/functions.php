@@ -30,7 +30,8 @@ function create_attachment ($attach) {
 //    $attachment_title = sanitize_file_name( pathinfo( $file_name, PATHINFO_FILENAME ) );
     include_once( ABSPATH . 'wp-admin/includes/image.php' );
     $imageurl = $attach['guid'];
-    $attachTitle = !empty($attach['post_title']) ? sanitize_file_name($attach['post_title']) : sanitize_file_name(pathinfo(basename($imageurl), PATHINFO_FILENAME));
+    $attachTitle = !empty($attach['post_title']) ? $attach['post_title'] : pathinfo(basename($imageurl), PATHINFO_FILENAME);
+    $attackTitle = preg_replace('/[^0-9a-z-]/i', '', sanitize_file_name($attachTitle));
     $imagetype = end(explode('/', getimagesize($imageurl)['mime']));
 //        $uniq_name = date('dmY').''.(int) microtime(true);
     $uploaddir = wp_upload_dir();

@@ -18,6 +18,7 @@ function insertResult($request)
 {
     try {
         $json_parsed = $request->get_json_params();
+        $lang  = $request->get_header('lang');
         if (empty($json_parsed)) {
             wp_send_json(false);
             return;

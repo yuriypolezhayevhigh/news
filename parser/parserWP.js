@@ -22,10 +22,9 @@ const mysql    = require('mysql'),
 
 class parserWP {
   constructor () {
-
     this.limit = 30
     this.offset = 0
-    this.lastDate = new Date('2020-07-17 14:47:19.000Z')
+    this.lastDate = new Date('2020-07-20 07:52:46.000Z')
     this.firstDate = new Date('2008-09-15 12:11:07.000Z')
     this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
     this.total = null
@@ -44,6 +43,7 @@ class parserWP {
     //   console.timeEnd("Posts Parser")
     //   console.log(this.totalRequest)
     // }, 5000)
+
     this.init()
   }
   async init () {
@@ -97,9 +97,9 @@ class parserWP {
           console.timeEnd("Posts Parser")
           console.log(this.totalRequest)
           console.log(this.offset, ' offset, ', this.total, ' total')
-         console.log(this.googleru.finish())
-         console.log(this.googleuk.finish())
-         console.log(this.googleen.finish())
+         this.googleru.finish()
+         this.googleuk.finish()
+         this.googleen.finish()
         }
       })
   }
@@ -122,7 +122,7 @@ class parserWP {
               if (Object.keys(translates).length === this.languages.length + 1) {
                 // console.log(translates)
 
-                needle.post(this.insertUrl, translates, { json:true }, (err, res) => {
+                needle.post(this.insertUrl, translates, { json : true,  headers: { 'lang': mainLang } }, (err, res) => {
                   if (err) {
                     console.log(err, 'error Request Save', this.insertUrl)
                     validationService(err)
