@@ -23,7 +23,7 @@ class parserWP {
   constructor () {
     this.limit = 30
     this.offset = 0
-    this.lastDate = new Date('2020-07-21T10:40:33.000Z') //DK
+    this.lastDate = new Date('2020-08-03T10:17:00.000Z') //DK
     this.firstDate = new Date('2007-09-15 12:11:07.000Z') //DK
     this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
     this.total = null
