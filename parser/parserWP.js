@@ -23,7 +23,9 @@ class parserWP {
   constructor () {
     this.limit = 30
     this.offset = 0
-    this.lastDate = new Date('2020-08-13T13:47:04.000Z') //DK
+    this.lastDate = new Date('2020-09-02T05:15:00.000Z') //DK
+    // this.firstDate = new Date('2020-08-21T07:38:59.000Z') //DK
+    // this.firstDate = new Date('2020-08-13T13:47:04.000Z') //DK
     this.firstDate = new Date('2007-09-15 12:11:07.000Z') //DK
     this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
     this.total = null
@@ -124,13 +126,13 @@ class parserWP {
           this.loop()
         } else {
           this.totalRequest.time = performance.now() - this.totalRequest.time
-          // console.timeEnd("Posts Parser")
+          console.timeEnd("Posts Parser")
           console.log(this.totalRequest)
           console.log(this.offset, ' offset, ', this.total, ' total')
-          this.parseNewDomain()
-         // this.googleru.finish()
-         // this.googleuk.finish()
-         // this.googleen.finish()
+          // this.parseNewDomain()
+         this.googleru.finish()
+         this.googleuk.finish()
+         this.googleen.finish()
         }
       })
   }
