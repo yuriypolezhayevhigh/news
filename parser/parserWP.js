@@ -23,7 +23,7 @@ class parserWP {
   constructor () {
     this.limit = 30
     this.offset = 0
-    this.lastDate = new Date('2020-10-16T13:35:56.000Z') //DK
+    this.lastDate = new Date('2020-10-20T09:40:25.000Z') //DK
     // this.firstDate = new Date('2020-08-21T07:38:59.000Z') //DK
     // this.firstDate = new Date('2020-08-13T13:47:04.000Z') //DK
     this.firstDate = new Date('2007-09-15 12:11:07.000Z') //DK
