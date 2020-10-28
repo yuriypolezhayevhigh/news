@@ -151,7 +151,7 @@ class parserWP {
         let originalPost = { ...data[0], ...data[1] }
         // console.log(item)
         // console.log(originalPost)
-        if (!await this.uniqueTest(originalPost)) {
+        if (await this.uniqueTest(originalPost)) {
           console.log('Not original post name or img', originalPost.post_title, originalPost.image)
           reject('Not original post name or img')
           return
@@ -214,9 +214,7 @@ class parserWP {
           return
         }
         console.log(res.body, 'uniqueTest')
-        if (res.body) {
-          resolve()
-        }
+        resolve(res.body)
       })
     })
   }
