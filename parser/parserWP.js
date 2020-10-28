@@ -171,7 +171,7 @@ class parserWP {
                     validationService(err)
                     return
                   }
-                  console.log(res.body)
+                  console.log(res.body, 'insertUrl res.body')
                   if (res.body) {
                     resolve()
                   }
