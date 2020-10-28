@@ -78,7 +78,7 @@ class googleTranslate {
                 string += data
                 resolve()
               }).catch(async () => {
-                await this.page.screenshot({ path: "./parser/photos/" + Date.now() + ".png", fullPage: true })
+                await this.page.screenshot({ path: "./parser/photos/big" + Date.now() + ".png", fullPage: true })
                 console.log('gg bro BIG')
               })
             })
@@ -106,7 +106,7 @@ class googleTranslate {
             result.push(res)
           }).catch(async () => {
             console.log('gg bro SMALL go restart')
-            await this.page.screenshot({ path: "./parser/photos/" + Date.now() + ".png", fullPage: true })
+            await this.page.screenshot({ path: "./parser/photos/small" + Date.now() + ".png", fullPage: true })
           })
         })
       }

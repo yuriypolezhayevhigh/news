@@ -28,6 +28,7 @@ class parserWP {
     // this.firstDate = new Date('2020-08-13T13:47:04.000Z') //DK
     this.firstDate = new Date('2007-09-15 12:11:07.000Z') //DK
     this.insertUrl = 'https://news.infinitum.tech/wp-json/parse/v1/insert'
+    this.uniqueUrl = 'https://news.infinitum.tech/wp-json/parse/v1/unique'
     this.total = null
     this.languages = [
       'ru',
@@ -85,8 +86,8 @@ class parserWP {
     this.googleen = new googleTranslate('en')
    await Promise.all([
        this.googleru.init(),
-       this.googleuk.init('uk'),
-       this.googleen.init('en'),
+       this.googleuk.init(),
+       this.googleen.init(),
     ])
     console.log('init google')
 
@@ -148,6 +149,13 @@ class parserWP {
         // console.log(data[1])
         // console.log({ ...data[0], ...data[1] })
         let originalPost = { ...data[0], ...data[1] }
+        // console.log(item)
+        // console.log(originalPost)
+        if (!await this.uniqueTest(originalPost)) {
+          console.log('Not original post name or img', originalPost.post_title, originalPost.image)
+          reject('Not original post name or img')
+          return
+        }
         let translates = {
           [mainLang]: originalPost,
         }
@@ -195,6 +203,21 @@ class parserWP {
         console.log('go miss post and try next, on translatePost')
         reject()
       }
+    })
+  }
+  async uniqueTest (originalPost) {
+    return await new Promise(  (resolve, reject) => {
+      needle.post(this.uniqueUrl, originalPost, { json : true }, (err, res) => {
+        if (err) {
+          console.log(err, 'error Request unique', this.uniqueUrl)
+          validationService(err)
+          return
+        }
+        console.log(res.body, 'uniqueTest')
+        if (res.body) {
+          resolve()
+        }
+      })
     })
   }
   async getPostMeta (item) {
