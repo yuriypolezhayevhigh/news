@@ -148,9 +148,9 @@ class googleTranslate {
     })
   }
 
-  finish () {
+  async finish () {
     console.log(this.lang, ' Google Browser End ', this.totalRequest)
-    this.browser.close()
+    await this.browser.close()
   }
 }
 

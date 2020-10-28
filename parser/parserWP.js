@@ -130,9 +130,11 @@ class parserWP {
           console.log(this.totalRequest)
           console.log(this.offset, ' offset, ', this.total, ' total')
           // this.parseNewDomain()
-         this.googleru.finish()
-         this.googleuk.finish()
-         this.googleen.finish()
+          await Promise.all([
+            this.googleru.finish(),
+            this.googleuk.finish(),
+            this.googleen.finish(),
+          ])
         }
       })
   }
