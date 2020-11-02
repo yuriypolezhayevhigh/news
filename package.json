@@ -5,7 +5,8 @@
   "scripts": {
     "parse": "node ./parser/parser.js",
     "parseGoogle": "node ./parser/googleTranslate.js",
-    "parseWP": "node ./parser/parserWP.js"
+    "parseWP": "node ./parser/parserWP.js",
+    "makePortfolio": "node ./parser/makePortfolio.js"
   },
   "repository": {
     "type": "git",
@@ -19,14 +20,14 @@
   "homepage": "https://github.com/swaty007/news#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "eslint": "^7.4.0",
+    "eslint": "^7.12.1",
     "eslint-plugin-node": "^11.1.0",
     "mysql": "^2.18.1",
-    "needle": "^2.5.0",
-    "puppeteer": "^5.0.0",
-    "puppeteer-extra": "^3.1.12",
-    "puppeteer-extra-plugin-recaptcha": "^3.1.13",
-    "puppeteer-extra-plugin-stealth": "^2.4.13",
+    "needle": "^2.5.2",
+    "puppeteer": "^5.4.1",
+    "puppeteer-extra": "^3.1.15",
+    "puppeteer-extra-plugin-recaptcha": "^3.1.19",
+    "puppeteer-extra-plugin-stealth": "^2.6.5",
     "tress": "^1.1.4"
   },
   "engines": {
