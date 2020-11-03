@@ -35,6 +35,87 @@ class makePorfolio {
         name: 'car.ua',
         url: 'https://car.ua/',
       },
+      {
+        name: 'Smart Cloud Connect',
+        url: 'https://smartcloudconnect.io/',
+      },
+    {
+      name: 'Mobzoid',
+        url: 'http://mobzoid.infinitum.tech/',
+    },
+    {
+      name: 'Octopus',
+        url: 'https://octopuscs.com/',
+    },
+    {
+      name: 'Green Aura',
+        url: 'https://green-aura.com.ua/',
+    },
+      {
+      name: 'Sensco Logistic',
+        url: 'http://logistic.infinitum.tech/',
+    },
+    {
+      name: 'Miff No',
+        url: 'https://miff.no/',
+    },
+    {
+      name: 'Crystal Group',
+        url: 'https://crystalgroup.ua/',
+    },
+      {
+        name: 'Ctr Center',
+        url: 'https://ctrcenter.org/',
+      },
+      {
+        name: 'Itea Ua',
+        url: 'https://itea.ua/',
+      },
+      {
+        name: 'Itea Online',
+        url: 'https://itea-web-master.demo.gns-it.com',
+        // url: 'http://itea-website/',
+      },
+      {
+        name: 'Legal Consult',
+        url: 'https://legal-consult.com.ua/',
+      },
+      {
+        name: 'Chernobyl UA',
+        url: 'https://chernobyl.ua/',
+      },
+      {
+        name: 'Swift Delivery',
+        url: 'https://swiftdeliverydc.com/',
+      },
+      {
+        name: 'Witch Bar',
+        url: 'https://www.witchbar.com.ua/',
+      },
+      {
+        name: 'Gios',
+        url: 'https://gioschool.com/',
+      },
+      {
+        name: 'Jungo',
+        url: 'https://jungo.dev/',
+      },
+      {
+        name: 'The Viking Planet',
+        url: 'https://thevikingplanet.com/',
+      },
+      {
+        name: 'Liquidator Pro',
+        url: 'https://liquidatorpro.com.ua/',
+      },
+      {
+        name: '',
+        url: '',
+      },
+      {
+        name: '',
+        url: '',
+      },
     ]
   }
 
@@ -65,9 +146,12 @@ class makePorfolio {
         await page.setViewport({ width: 375, height: 667 })
       })
     for (let index = 0; index < this.sites.length; index++) {
+      // console.log(this.sites[index].url)
       console.log(index)
       await this.makePhoto(this.sites[index])
     }
+    console.log('finish')
+    await this.finish()
   }
 
   async makePhoto (data) {
@@ -111,7 +195,9 @@ console.log(data)
 
 
   async finish () {
-    await this.browser.close()
+    await this.browserComp.close()
+    await this.browserDesktop.close()
+    await this.browserMobile.close()
   }
 }
 
