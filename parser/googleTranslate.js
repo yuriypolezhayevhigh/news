@@ -35,7 +35,8 @@ class googleTranslate {
         try {
           const page = this.page = await browser.newPage()
           await page.setViewport({ width: 1280, height: 800 })
-          await page.goto(`https://translate.google.ru/#view=home&op=translate&sl=auto&tl=${ this.lang }&`, { waitUntil: 'networkidle0' })
+          // await page.goto(`https://translate.google.ru/#view=home&op=translate&sl=auto&tl=${ this.lang }&`, { waitUntil: 'networkidle0' })
+          await page.goto(`https://translate.google.ru/#view=home&sl=auto&tl=${ this.lang }&op=translate`, { waitUntil: 'networkidle0' })
           await page.solveRecaptchas()
           resolve()
         } catch (e) {
@@ -129,7 +130,13 @@ class googleTranslate {
         // await page.waitForNavigation({waitUntil: 'networkidle0'});
         await page.waitForTimeout(1300)
         let input = await page.$('#source')
-        await page.evaluate((el) => el.value = '', input)
+        try {
+          await page.evaluate((el) => el.value = '', input)
+        } catch (e) {
+          await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
+          await page.evaluate((el) => el.value = '', input)
+        }
+
         // await page.type('#source', string, { delay: 0 })
         await page.waitForTimeout(1500)
         await page.evaluate((el, string) => el.value = string, input, string)
