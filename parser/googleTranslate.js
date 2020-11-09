@@ -133,6 +133,7 @@ class googleTranslate {
         try {
           await page.evaluate((el) => el.value = '', input)
         } catch (e) {
+          console.log('source ERROR')
           await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
           await page.evaluate((el) => el.value = '', input)
         }
