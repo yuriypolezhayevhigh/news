@@ -38,7 +38,15 @@ class googleTranslate {
           // await page.goto(`https://translate.google.ru/#view=home&op=translate&sl=auto&tl=${ this.lang }&`, { waitUntil: 'networkidle0' })
           await page.goto(`https://translate.google.ru/#view=home&sl=auto&tl=${ this.lang }&op=translate`, { waitUntil: 'networkidle0' })
           await page.solveRecaptchas()
-          resolve()
+          let input = await page.$('#source')
+          if (input == null) {
+            await this.browser.close()
+            await this.init().then(data => {
+              resolve()
+            })
+          } else {
+            resolve()
+          }
         } catch (e) {
           validationService(e)
         }
@@ -63,7 +71,8 @@ class googleTranslate {
 
         let step = 0
         while(text.length > step) {
-          await this.page.waitForTimeout(500)
+          // await this.page.waitForTimeout(500)
+          await this.page.waitFor(500)
           let slice = text.slice(step, maxLength)
           let last_index = slice.lastIndexOf('.')
           last_index = last_index > 0 ? last_index : step + maxLength
@@ -72,7 +81,8 @@ class googleTranslate {
               string += data
               resolve()
             }).catch(async (err) => {
-              await this.page.waitForTimeout(20000)
+              // await this.page.waitForTimeout(20000)
+              await this.page.waitFor(20000)
               console.log('go to restart: BIG DATA ')
               step = last_index
               this.translateString(text.slice( Math.ceil(step), Math.ceil(last_index + maxLength)) ).then((data) => {
@@ -97,11 +107,13 @@ class googleTranslate {
         //   })
         // }
       } else {
-        await this.page.waitForTimeout(300)
+        await this.page.waitFor(300)
+        // await this.page.waitForTimeout(300)
         await this.translateString(text).then((res) => {
           result.push(res)
         }).catch(async (err) => {
-          await this.page.waitForTimeout(20000)
+          await this.page.waitFor(20000)
+          // await this.page.waitForTimeout(20000)
           console.log('go to restart: Small DATA')
           await this.translateString(text).then((res) => {
             result.push(res)
@@ -128,7 +140,8 @@ class googleTranslate {
       try {
         const page = this.page
         // await page.waitForNavigation({waitUntil: 'networkidle0'});
-        await page.waitForTimeout(1300)
+        await page.waitFor(1300)
+        // await page.waitForTimeout(1300)
         let input = await page.$('#source')
         try {
           await page.evaluate((el) => el.value = '', input)
@@ -139,12 +152,14 @@ class googleTranslate {
         }
 
         // await page.type('#source', string, { delay: 0 })
-        await page.waitForTimeout(1500)
+        // await page.waitForTimeout(1500)
+        await page.waitFor(1500)
         await page.evaluate((el, string) => el.value = string, input, string)
         await page.waitForResponse(response => response.url().startsWith('https://translate.google.ru/translate_a/single'))
         await page.waitForSelector('.tlid-translation.translation', { visible: true })
         let element = await page.$('.tlid-translation.translation')
-        await page.waitForTimeout(2200)
+        // await page.waitForTimeout(2200)
+        await page.waitFor(2200)
         let html = await page.evaluate(el => el.innerHTML, element)
         // console.log(html)
         resolve(html.replace(/<span\b[^<]*>(.*?)<\/span>/gm, '$1').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
