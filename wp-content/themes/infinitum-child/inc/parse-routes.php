@@ -24,9 +24,10 @@ function uniqueTest($request) {
     $imageurl = $json_parsed['image']['guid'];
 
     $postFinded = get_page_by_title($json_parsed['post_title'], OBJECT, ['post', 'attachment']);
-    $imgFinded = get_page_by_title(pathinfo(basename($imageurl), PATHINFO_FILENAME), OBJECT, ['post', 'attachment']);
-    $imgFinded2 = get_page_by_title($json_parsed['image']['post_title'], OBJECT, ['post', 'attachment']);
-    if (!empty($postFinded) || !empty($imgFinded) || !empty($imgFinded2)) {
+//    $imgFinded = get_page_by_title(pathinfo(basename($imageurl), PATHINFO_FILENAME), OBJECT, ['post', 'attachment']);
+//    $imgFinded2 = get_page_by_title($json_parsed['image']['post_title'], OBJECT, ['post', 'attachment']);
+//    if (!empty($postFinded) || !empty($imgFinded) || !empty($imgFinded2)) {
+    if (!empty($postFinded)) {
         wp_send_json(true);
     } else {
         wp_send_json(false);
